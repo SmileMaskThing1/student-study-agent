@@ -53,17 +53,19 @@ def calculator(expression: str):
 
         return evaluate(tree)
 
-    except (ValueError, SyntaxError, ZeroDivisionError,
-            OverflowError, TypeError, RecursionError) as error:
+    except (
+        ValueError, SyntaxError, ZeroDivisionError,
+        OverflowError, TypeError, RecursionError
+    ) as error:
         return f"Error: {error}"
 
 
 def deadline_calculator(date_text: str):
     """
     Name: deadline_calculator
-    Description: Calculates the number of days until a specified date.
+    Description: Calculates days until a specified date.
     Parameters: date_text (str), a date in YYYY-MM-DD format.
-    Returns: The number of days remaining, or an error message.
+    Returns: Days remaining or an error message.
     """
     if not isinstance(date_text, str):
         return "Error: Enter a date in YYYY-MM-DD format."
@@ -72,7 +74,9 @@ def deadline_calculator(date_text: str):
         return "Error: Enter a date in YYYY-MM-DD format."
 
     try:
-        target_date = datetime.strptime(date_text, "%Y-%m-%d").date()
+        target_date = datetime.strptime(
+            date_text, "%Y-%m-%d"
+        ).date()
     except ValueError:
         return "Error: That is not a valid date."
 
@@ -91,7 +95,7 @@ def search_notes(query: str):
     Name: search_notes
     Description: Searches local study notes for matching lines.
     Parameters: query (str), the topic or terms to search for.
-    Returns: Matching note lines or a helpful message.
+    Returns: The most relevant note lines or a helpful message.
     """
     if not isinstance(query, str) or not query.strip():
         return "Error: Enter a topic to search for."
@@ -108,23 +112,27 @@ def search_notes(query: str):
     if not query_words:
         return "Error: Enter a valid search term."
 
-    matches = []
+    exact_matches = []
+    partial_matches = []
 
     for line_number, line in enumerate(contents.splitlines(), start=1):
         note_words = set(re.findall(r"\w+", line.lower()))
         score = len(query_words & note_words)
 
-        if score > 0:
-            matches.append((score, line_number, line.strip()))
+        if score == len(query_words):
+            exact_matches.append((score, line_number, line.strip()))
+        elif score > 0:
+            partial_matches.append((score, line_number, line.strip()))
 
+    # Prefer lines containing every query term.
+    # Fall back to partial matches if no exact matches exist.
+    matches = exact_matches if exact_matches else partial_matches
     matches.sort(key=lambda item: (-item[0], item[1]))
 
     if not matches:
         return "No matching notes found."
 
-    results = [
+    return "\n".join(
         f"Line {line_number}: {line}"
         for score, line_number, line in matches[:5]
-    ]
-
-    return "\n".join(results)
+    )
