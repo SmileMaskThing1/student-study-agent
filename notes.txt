@@ -1,0 +1,8 @@
+
+Cryptography is the study of techniques for securing information.
+Encryption transforms readable data into ciphertext.
+Decryption converts ciphertext back into readable information.
+Symmetric encryption uses the same key for encryption and decryption.
+Asymmetric encryption uses a public key and a private key.
+A hash function produces a fixed-length digest from input data.
+Authentication helps verify the identity of a user or system.
